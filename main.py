@@ -8,7 +8,7 @@ def vault_data_to_vault(vault:dict):
         json.dump(vault,file)
 
 def save_to_vault(master_password:str,salt:bytes,vault_data:dict):
-    kdf = PBKDF2HMAC(algorithm= hashes.SHA256(), length=32,salt=salt,iterations=50000)
+    kdf = PBKDF2HMAC(algorithm= hashes.SHA256(), length=32,salt=salt,iterations=1200000)
     key = base64.urlsafe_b64encode(kdf.derive(master_password.encode()))
     encryptor = Fernet(key)
     encrypted_vault_data = encryptor.encrypt(json.dumps(vault_data).encode())
@@ -74,7 +74,7 @@ if not os.path.exists('vault.json'): #no vault = vault creation
             if master_password == input('Enter master password again: '):
                 salt = os.urandom(16)
                 vault_data = json.dumps({}).encode()
-                kdf = PBKDF2HMAC(algorithm= hashes.SHA256(), length=32,salt=salt,iterations=50000)
+                kdf = PBKDF2HMAC(algorithm= hashes.SHA256(), length=32,salt=salt,iterations=1200000)
                 key = base64.urlsafe_b64encode(kdf.derive(master_password.encode()))
                 encryptor = Fernet(key)
                 encrypted_vault_data = encryptor.encrypt(vault_data)
@@ -94,7 +94,7 @@ else:
         vault = json.load(file)
     salt = base64.urlsafe_b64decode(vault['salt'].encode())
     encrypted_vault_data = base64.urlsafe_b64decode(vault['vault_data'].encode())
-    kdf = PBKDF2HMAC(algorithm= hashes.SHA256(), length=32,salt=salt,iterations=50000)
+    kdf = PBKDF2HMAC(algorithm= hashes.SHA256(), length=32,salt=salt,iterations=1200000)
     key = base64.urlsafe_b64encode(kdf.derive(master_password.encode()))
     decryptor = Fernet(key)
     try:
