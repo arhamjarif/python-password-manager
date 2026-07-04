@@ -7,6 +7,12 @@ def data_to_vault(vault:dict):
     with open('vault.json','wt') as file:
         json.dump(vault,file)
 
+def add(data:dict):
+    service = input('Service of this new entry: ')
+    username = input('Enter username: ')
+    password = input('Enter password: ')
+    data[service] = (username,password)
+
 if not os.path.exists('vault.json'): #no vault = vault creation
     print('No vault found. Would you like to create a vault?\n1.Yes\n2.No')
     if '1' == input('Enter your choice[1,2]: '):
@@ -39,17 +45,20 @@ else:
     key = base64.urlsafe_b64encode(kdf.derive(password.encode()))
     decryptor = Fernet(key)
     try:
-        data = decryptor.decrypt(encrypted_data)
+        data_in_bytes = decryptor.decrypt(encrypted_data)
+        data = json.loads(data_in_bytes.decode())
         while True:
             print('1. Add password\n2. View saved passwords\n3. Delete a saved password\n4. Exit')
             match input('Enter your choice: '):
                 case '1':
-                    add()
+                    add(data)
+                    print(data)
                 case '2':
                     view()
                 case '3':
                     delete()
                 case '4':
+                    encrypt()
                     break
                 case _:
                     print('Invalid choice. Try again.')
