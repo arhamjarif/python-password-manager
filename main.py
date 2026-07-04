@@ -28,9 +28,27 @@ def add(data:dict,master_password:str,salt:bytes):
 
 def view(data:dict):
     i = 0
+    print()
     for key,value in data.items():
         i += 1
         print(f'Entry {i}:\n\n    Service: {key}\n    Username: {value[0]}\n    Password: {value[1]}\n')
+
+def delete(data:dict,master_password:str,salt:bytes):
+    print('Saved services:\n')
+    for service in data.keys():
+        print(service)
+    del_choice = input('\nEnter service to delete: ')
+    if del_choice in data:
+        del data[del_choice]
+        print(f'\n{del_choice} successfully deleted')
+        save_to_vault(master_password,salt,data)
+    else:
+        print('\nService not found')
+
+
+
+
+
 
 if not os.path.exists('vault.json'): #no vault = vault creation
     print('No vault found. Would you like to create a vault?\n1.Yes\n2.No')
@@ -74,7 +92,7 @@ else:
                 case '2':
                     view(data)
                 case '3':
-                    delete()
+                    delete(data,master_password,salt)
                 case '4':
                     break
                 case _:
