@@ -1,7 +1,8 @@
 import os,base64,json
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
+
 def data_to_vault(vault:dict):
     with open('vault.json','wt') as file:
         json.dump(vault,file)
@@ -27,3 +28,19 @@ if not os.path.exists('vault.json'): #no vault = vault creation
                 break
             else:
                 print('Entered password did not match. Please try again')
+else:
+    password = input('Enter password: ')
+    vault = None
+    with open('vault.json') as file:
+        vault = json.load(file)
+    salt = base64.urlsafe_b64decode(vault['salt'].encode())
+    encrypted_data = base64.urlsafe_b64decode(vault['data'].encode())
+    kdf = PBKDF2HMAC(algorithm= hashes.SHA256(), length=32,salt=salt,iterations=50000)
+    key = base64.urlsafe_b64encode(kdf.derive(password.encode()))
+    decryptor = Fernet(key)
+    try:
+        data = decryptor.decrypt(encrypted_data)
+        print(data)
+
+    except InvalidToken:
+        print('Wrong password')
