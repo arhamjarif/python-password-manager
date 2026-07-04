@@ -40,7 +40,19 @@ else:
     decryptor = Fernet(key)
     try:
         data = decryptor.decrypt(encrypted_data)
-        print(data)
+        while True:
+            print('1. Add password\n2. View saved passwords\n3. Delete a saved password\n4. Exit')
+            match input('Enter your choice: '):
+                case '1':
+                    add()
+                case '2':
+                    view()
+                case '3':
+                    delete()
+                case '4':
+                    break
+                case _:
+                    print('Invalid choice. Try again.')
 
     except InvalidToken:
         print('Wrong password')
